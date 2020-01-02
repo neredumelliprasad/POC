@@ -17,15 +17,15 @@ public class ValidationResult
     private String fieldName;
     private ErrorType errorType;
     private Object data;
-    private int recordPosition;
+    private int recordNumber;
 
 
-    public ValidationResult(String fieldName, ErrorType errorType, Object data, int recordPosition)
+    public ValidationResult(String fieldName, ErrorType errorType, Object data, int recordNumber)
     {
         this.fieldName = fieldName;
         this.errorType = errorType;
         this.data = data;
-        this.recordPosition = recordPosition;
+        this.recordNumber = recordNumber;
     }
 
 
@@ -47,8 +47,8 @@ public class ValidationResult
     }
 
 
-    public int getRecordPosition()
+    public int getRecordNumber()
     {
-        return recordPosition;
+        return recordNumber;
     }
 }

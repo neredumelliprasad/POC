@@ -1,13 +1,18 @@
 package com.eunice.sap.hana.model;
 
+import com.eunice.sap.hana.service.Validable;
+import java.lang.reflect.Field;
+
 /**
  * Created by vmullapu on 14/12/19.
  */
-public class RawProductData extends Validable {
+public class RawProductData extends Validable
+{
 
     @MandatoryField
     @NumberValidator
     String number;
+    @MandatoryField
     String material;
     String industrySector;
     String materialType;
@@ -681,4 +686,15 @@ public class RawProductData extends Validable {
         this.qunatityNumerator = qunatityNumerator;
     }
 
+
+    @Override
+    public Object getData(Field field)
+    {
+        try{
+            return field.get(this);
+        }
+        catch (IllegalAccessException e){
+            throw new RuntimeException("Error while accessing field",e);
+        }
+    }
 }

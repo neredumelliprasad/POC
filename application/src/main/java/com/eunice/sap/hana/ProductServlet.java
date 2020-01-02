@@ -15,19 +15,15 @@ import com.sap.cloud.sdk.s4hana.datamodel.odata.services.DefaultProductMasterSer
 import com.sap.cloud.sdk.s4hana.datamodel.odata.services.ProductMasterService;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 
 @WebServlet("/masterdata/product")
-public class ProductServlet extends HttpServlet
+public class ProductServlet extends OdataServlet
 {
     private static final long serialVersionUID = 1L;
     private static final Logger logger = CloudLoggerFactory.getLogger(ProductServlet.class);
@@ -36,7 +32,6 @@ public class ProductServlet extends HttpServlet
     private static final ProductDataService productBuilderService;
 
     static {
-            String destinationName = "DFJ300_HTTPS_CLONING";
             ProductMasterService productMasterService = new DefaultProductMasterService();
             ProductMasterServiceBatch productMasterServiceBatch = new DefaultProductMasterServiceBatch(productMasterService);
             productMasterDataService = new ProductMasterDataService(productMasterServiceBatch,productMasterService,destinationName);
@@ -47,7 +42,7 @@ public class ProductServlet extends HttpServlet
     protected void doGet( final HttpServletRequest request, final HttpServletResponse response )
         throws IOException
     {
-        response.setHeader("Content-Type","application/json;charset=utf-8");
+        super.doGet(request,response);
         try{
             List<Product> partnerList = productMasterDataService.getProductTop10();
             objectMapper.writeValue(response.getWriter(),partnerList);
@@ -61,13 +56,13 @@ public class ProductServlet extends HttpServlet
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
     {
+        super.doPost(req,resp);
         InputStream is = req.getInputStream();
         TypeReference<List<RawProductData>> rawProductTypeRef = new TypeReference<List<RawProductData>>() {};
-        resp.setHeader("Content-Type","application/json;charset=utf-8");
         try
         {
             List<RawProductData> rawProductDataList = objectMapper.readValue(is,rawProductTypeRef);
-            List<ValidationResult> validationResults = productBuilderService.validate(rawProductDataList);
+            List<ValidationResult> validationResults = validateOdataObject(rawProductDataList);
             if (validationResults.isEmpty())
             {
                 List<Product> products = productBuilderService.buildProductMasterData(rawProductDataList);
@@ -83,12 +78,5 @@ public class ProductServlet extends HttpServlet
             objectMapper.writeValue(resp.getWriter(),getErrorResponse(e));
         }
 
-    }
-
-    private Object getErrorResponse(Exception e){
-        Map<String,Object> errorData = new HashMap<>();
-        errorData.put("stackTrace",ExceptionUtils.getStackTrace(e));
-        errorData.put("errorMessage",ExceptionUtils.getMessage(e));
-        return errorData;
     }
 }
