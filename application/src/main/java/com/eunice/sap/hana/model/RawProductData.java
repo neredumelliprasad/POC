@@ -8,7 +8,9 @@ import java.lang.reflect.Field;
  */
 public class RawProductData extends Validable
 {
-
+    @MandatoryField
+    @NumberValidator
+    String number;
     @MandatoryField
     String material;
     String industrySector;
@@ -675,7 +677,17 @@ public class RawProductData extends Validable
         this.qunatityNumerator = qunatityNumerator;
     }
 
+    public String getNumber()
+    {
+        return number;
+    }
 
+
+    public RawProductData setNumber(String number)
+    {
+        this.number = number;
+        return this;
+    }
     @Override
     public Object getData(Field field)
     {

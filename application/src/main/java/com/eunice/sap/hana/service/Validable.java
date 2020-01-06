@@ -44,7 +44,6 @@ public abstract class Validable
     }
 
     public final Set<ValidationResult> validate(int pos){
-        Validable validable = this;
         Set<ValidationResult> validationResults = new HashSet<>();
         rawDataFields.stream().forEach(each->{
             try

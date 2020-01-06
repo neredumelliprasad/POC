@@ -1,9 +1,9 @@
 package com.eunice.sap.hana;
 
+import com.eunice.sap.hana.model.DataConstructionContext;
 import com.eunice.sap.hana.model.MasterDataUpdateResponse;
 import com.eunice.sap.hana.model.RawProductData;
 import com.eunice.sap.hana.model.ValidationResult;
-import com.eunice.sap.hana.service.ProductDataService;
 import com.eunice.sap.hana.service.ProductMasterDataService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +16,7 @@ import com.sap.cloud.sdk.s4hana.datamodel.odata.services.ProductMasterService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -29,13 +30,11 @@ public class ProductServlet extends OdataServlet
     private static final Logger logger = CloudLoggerFactory.getLogger(ProductServlet.class);
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final ProductMasterDataService productMasterDataService;
-    private static final ProductDataService productBuilderService;
 
     static {
             ProductMasterService productMasterService = new DefaultProductMasterService();
             ProductMasterServiceBatch productMasterServiceBatch = new DefaultProductMasterServiceBatch(productMasterService);
             productMasterDataService = new ProductMasterDataService(productMasterServiceBatch,productMasterService,destinationName);
-            productBuilderService = new ProductDataService();
     }
 
     @Override
@@ -65,7 +64,10 @@ public class ProductServlet extends OdataServlet
             List<ValidationResult> validationResults = validateOdataObject(rawProductDataList);
             if (validationResults.isEmpty())
             {
-                List<Product> products = productBuilderService.buildProductMasterData(rawProductDataList);
+                DataConstructionContext constructionContext = new DataConstructionContext();
+                List<Product> products = rawProductDataList.parallelStream().
+                    map(each->productMasterDataService.createEntity(each,constructionContext)).
+                    collect(Collectors.toList());
                 MasterDataUpdateResponse response = productMasterDataService.persistProducts(products);
                 objectMapper.writeValue(resp.getWriter(), response);
             }
