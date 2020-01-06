@@ -29,7 +29,7 @@ public class ProductDataService
 
         rawProductData.stream().forEach( e -> {
             Product product = new Product();
-            product.setProduct(e.getNumber());
+            product.setProduct(e.getMaterial());
             product.setProductType(e.getMaterialType());
             product.addPlant(buildProductPlant(e));
 
@@ -45,15 +45,13 @@ public class ProductDataService
             ProductSalesDelivery productSalesDelivery = new ProductSalesDelivery();
             productSalesDelivery.setSalesMeasureUnit(e.getSalesUnit());
             productSalesDelivery.setSupplyingPlant(e.getDeliveryPlantSpecStatus());
+            product.addSalesDelivery(productSalesDelivery);
             product.setItemCategoryGroup(e.getItemCategoryGroup());
             product.setProductHierarchy(e.getProductHierarchy());
             product.setIsBatchManagementRequired(Boolean.valueOf(e.getBatchManagement())); //validation null check and boolean check
 
             ProductSales productSales = new ProductSales();
             productSales.setTransportationGroup(e.getTransportationGroup());
-
-            ProductPlantSales productPlantSales = new ProductPlantSales();
-            productPlantSales.setLoadingGroup(e.getLoadingGroup());
 
             product.setSerialNumberProfile(e.getSerialNoProfile());
             product.setCountryOfOrigin(e.getCountryOfOrigin());
@@ -74,9 +72,8 @@ public class ProductDataService
             productUnitsOfMeasure.setQuantityNumerator(new BigDecimal(e.getQunatityNumerator())); //BigDecimal
             product.addProductUnitsOfMeasure(productUnitsOfMeasure);
 
-            //setProductPlantSales in product or productPlant
-            //Set product Sales delivery in product
             product.setProductSales(productSales);
+
             productList.add(product);
         });
         return productList;
@@ -99,13 +96,18 @@ public class ProductDataService
 
         productPlant.addPlantMRPArea(productPlantMRPArea);
         productPlant.setProductSupplyPlanning(productSupplyPlanning);
+
+        ProductPlantSales productPlantSales = new ProductPlantSales();
+        productPlantSales.setLoadingGroup(rawProductData.getLoadingGroup());
+        productPlant.setPlantSales(productPlantSales);
+
         return productPlant;
     }
 
     private ProductStorageLocation buildProductStorageLocation(RawProductData rawProductData) {
         ProductStorageLocation productStorageLocation = new ProductStorageLocation();
         productStorageLocation.setStorageLocation(rawProductData.getStoreLocation());
-        productStorageLocation.setProduct(rawProductData.getNumber());
+        productStorageLocation.setProduct(rawProductData.getMaterial());
         return productStorageLocation;
     }
 

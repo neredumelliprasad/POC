@@ -10,9 +10,6 @@ public class RawProductData extends Validable
 {
 
     @MandatoryField
-    @NumberValidator
-    String number;
-    @MandatoryField
     String material;
     String industrySector;
     String materialType;
@@ -117,14 +114,6 @@ public class RawProductData extends Validable
     String aun;
     @NumberValidator
     String qunatityNumerator;
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
 
     public String getMaterial() {
         return material;
