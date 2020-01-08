@@ -41,7 +41,7 @@ public class RawDataProductMapper implements RawDataMapper<Product>
     private ProductStorageLocation buildProductStorageLocation(RawProductData rawProductData,DataConstructionContext constructionContext) {
         ProductStorageLocation productStorageLocation = new ProductStorageLocation();
         productStorageLocation.setStorageLocation(rawProductData.getStoreLocation());
-        productStorageLocation.setProduct(rawProductData.getNumber());
+        productStorageLocation.setProduct(rawProductData.getMaterial());
         return productStorageLocation;
     }
 
@@ -103,7 +103,7 @@ public class RawDataProductMapper implements RawDataMapper<Product>
     public Product createEntity(RawProductData rawProductData,DataConstructionContext constructionContext){
         String key = rawProductData.getMaterial();
         Product product = constructionContext.getProductMap().containsKey(key)?constructionContext.getProductMap().get(key):new Product();
-        product.setProduct(rawProductData.getNumber());
+        product.setProduct(rawProductData.getMaterial());
         product.setProductType(rawProductData.getMaterialType());
         product.setProductOldID(rawProductData.getOldMaterialNumber());
         product.setDivision(rawProductData.getDivision());
